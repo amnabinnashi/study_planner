@@ -3,38 +3,23 @@ import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../providers/study_provider.dart';
+import '../add_subject/add_subject_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  final nameController = TextEditingController();
-  final hoursController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController hoursController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<StudyProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text("Study Planner")),
+      appBar: AppBar(
+        title: Text("Study Planner"),
+      ),
+
       body: Column(
         children: [
-          TextField(
-            controller: nameController,
-            decoration: InputDecoration(labelText: "Subject"),
-          ),
-          TextField(
-            controller: hoursController,
-            decoration: InputDecoration(labelText: "Hours"),
-            keyboardType: TextInputType.number,
-          ),
-          ElevatedButton(
-            onPressed: () {
-              provider.addSubject(
-                nameController.text,
-                int.parse(hoursController.text),
-              );
-            },
-            child: Text("Add"),
-          ),
-
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: provider.subjectsStream,
@@ -55,8 +40,9 @@ class HomeScreen extends StatelessWidget {
 
                     return ListTile(
                       title: Text(s['name']),
-                      subtitle:
-                          LinearProgressIndicator(value: progress),
+                      subtitle: LinearProgressIndicator(
+                        value: progress,
+                      ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -85,6 +71,19 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+
+      
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => AddSubjectScreen(),
+            ),
+          );
+        },
       ),
     );
   }
