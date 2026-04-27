@@ -12,22 +12,35 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Study Planner"),
+        title: const Text("📚 Study Planner"),
         centerTitle: true,
       ),
 
       body: StreamBuilder<QuerySnapshot>(
         stream: provider.subjectsStream,
         builder: (context, snapshot) {
-        
+
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          
+          // 🔥 إذا ما فيه بيانات (هنا حطينا صورة empty)
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(
-              child: Text("No subjects yet"),
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/images/empty.png',
+                    height: 180,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "No subjects yet",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ],
+              ),
             );
           }
 
@@ -42,17 +55,26 @@ class HomeScreen extends StatelessWidget {
               int total = s['totalHours'];
 
               double progress =
-                  total == 0 ? 0 : done / total; // 🔥 حماية من الخطأ
+                  total == 0 ? 0 : done / total;
 
               return Card(
                 margin: const EdgeInsets.symmetric(
                     horizontal: 12, vertical: 6),
                 child: ListTile(
-                  title: Text(
-                    s['name'],
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  title: Row(
+                    children: [
+                      Image.asset(
+                        'assets/images/home.png',
+                        height: 30,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        s['name'],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
 
                   subtitle: Column(
@@ -69,7 +91,10 @@ class HomeScreen extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.add),
+                        icon: Image.asset(
+                          'assets/images/add.png',
+                          height: 22,
+                        ),
                         onPressed: () {
                           provider.addProgress(
                             s.id,
@@ -93,9 +118,11 @@ class HomeScreen extends StatelessWidget {
         },
       ),
 
-      
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
+        child: Image.asset(
+          'assets/images/add.png',
+          height: 25,
+        ),
         onPressed: () {
           Navigator.push(
             context,
