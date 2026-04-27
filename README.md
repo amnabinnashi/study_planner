@@ -39,6 +39,18 @@ lib/
 2. Navigate to the project folder.
 3. Get dependencies.
 4.  4. Run the app.
+  
+---
+
+## Notes
+This project is built for learning purposes and can be extended with:
+- Cloud sync
+- Notifications
+
+
+
+## Author
+Made with Flutter 💙 by **AmnaBinNashi**
 
 
 
