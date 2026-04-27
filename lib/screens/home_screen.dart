@@ -6,76 +6,96 @@ import '../../providers/study_provider.dart';
 import '../add_subject/add_subject_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController hoursController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<StudyProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Study Planner"),
+        title: const Text("Study Planner"),
+        centerTitle: true,
       ),
 
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: provider.subjectsStream,
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
-                }
+      body: StreamBuilder<QuerySnapshot>(
+        stream: provider.subjectsStream,
+        builder: (context, snapshot) {
+        
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                final docs = snapshot.data!.docs;
+          
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(
+              child: Text("No subjects yet"),
+            );
+          }
 
-                return ListView.builder(
-                  itemCount: docs.length,
-                  itemBuilder: (context, i) {
-                    final s = docs[i];
+          final docs = snapshot.data!.docs;
 
-                    double progress =
-                        s['doneHours'] / s['totalHours'];
+          return ListView.builder(
+            itemCount: docs.length,
+            itemBuilder: (context, i) {
+              final s = docs[i];
 
-                    return ListTile(
-                      title: Text(s['name']),
-                      subtitle: LinearProgressIndicator(
-                        value: progress,
+              int done = s['doneHours'];
+              int total = s['totalHours'];
+
+              double progress =
+                  total == 0 ? 0 : done / total; // 🔥 حماية من الخطأ
+
+              return Card(
+                margin: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 6),
+                child: ListTile(
+                  title: Text(
+                    s['name'],
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 6),
+                      LinearProgressIndicator(value: progress),
+                      const SizedBox(height: 4),
+                      Text("$done / $total hours"),
+                    ],
+                  ),
+
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.add),
+                        onPressed: () {
+                          provider.addProgress(
+                            s.id,
+                            done,
+                            total,
+                          );
+                        },
                       ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.add),
-                            onPressed: () {
-                              provider.addProgress(
-                                s.id,
-                                s['doneHours'],
-                                s['totalHours'],
-                              );
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () {
-                              provider.deleteSubject(s.id);
-                            },
-                          ),
-                        ],
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          provider.deleteSubject(s.id);
+                        },
                       ),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        ],
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
       ),
 
       
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
         onPressed: () {
           Navigator.push(
             context,
