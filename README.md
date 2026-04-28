@@ -50,7 +50,7 @@ This project is built for learning purposes and can be extended with:
 
 
 ## Author
-Made with Flutter 💙 by **AmnaBinNashi**
+Made with Flutter by **AmnaBinNashi**
 
 
 
